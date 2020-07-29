@@ -9,7 +9,8 @@ import sangria.marshalling.circe._
 import sangria.parser.QueryParser
 import training.Server.log
 import training.config.SchemaDefinition
-import training.{GraphqlRequest, ShopRepository}
+import training.GraphqlRequest
+import training.modules.shops.ShopRepository
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}

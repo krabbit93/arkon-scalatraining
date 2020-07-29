@@ -1,7 +1,6 @@
 package training.entrypoint
 
-import training.ShopRepository
-import training.domain.Shop
+import training.modules.shops.{Shop, ShopRepository}
 
 final class GraphqlShopReductor(private val shopRepository: ShopRepository) extends ShopReductor {
 

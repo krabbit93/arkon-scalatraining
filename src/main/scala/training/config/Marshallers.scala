@@ -3,7 +3,7 @@ package training.config
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Encoder, HCursor, Json}
 import training.GraphqlRequest
-import training.domain.CommercialActivity
+import training.modules.shops.CommercialActivity
 
 object Marshallers {
   implicit object GraphMarshall extends Decoder[GraphqlRequest] {

@@ -1,8 +1,8 @@
 package training.config
 
 import sangria.schema.{Argument, Field, IntType, ListType, LongType, ObjectType, Schema, StringType, fields}
-import training.domain.{CommercialActivity, Shop, ShopType, Stratum}
 import training.entrypoint.ShopReductor
+import training.modules.shops.{CommercialActivity, Shop, ShopType, Stratum}
 
 object SchemaDefinition {
 

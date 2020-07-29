@@ -1,4 +1,4 @@
-package training.domain
+package training.modules.shops
 
 case class CommercialActivity(id: Int, name: String)
 

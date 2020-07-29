@@ -1,6 +1,6 @@
 package training.entrypoint
 
-import training.domain.Shop
+import training.modules.shops.Shop
 
 trait ShopReductor {
   def createShop(

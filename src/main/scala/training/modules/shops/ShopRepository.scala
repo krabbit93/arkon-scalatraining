@@ -1,6 +1,4 @@
-package training
-
-import training.domain._
+package training.modules.shops
 
 class ShopRepository {
 
