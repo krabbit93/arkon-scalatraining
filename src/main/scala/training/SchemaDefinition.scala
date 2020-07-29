@@ -1,6 +1,7 @@
 package training
 
 import sangria.schema._
+import training.domain._
 
 object SchemaDefinition {
 
@@ -58,12 +59,12 @@ object SchemaDefinition {
     )
   )
 
-  val query = ObjectType("Query", fields[CommercialActivityRepo, Unit](
+  val query = ObjectType("Query", fields[ShopRepository, Unit](
     Field("activities", ListType(shop), resolve = _.ctx.getAll())
   ))
 
   val mutation = ObjectType("Mutation",
-    fields[CommercialActivityRepo, Unit] (
+    fields[ShopRepository, Unit] (
       Field("createUser", shop,
         arguments = List(
           Argument("businessName", StringType),

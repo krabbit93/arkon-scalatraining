@@ -17,7 +17,7 @@ object Processor {
     QueryParser.parse(json.query) match {
       case Success(document) => {
         complete(Executor.execute(
-          SchemaDefinition.schema, document, new CommercialActivityRepo,
+          SchemaDefinition.schema, document, new ShopRepository,
           variables = InputUnmarshaller.emptyMapVars,
           operationName = json.operationName
         ).map(res => OK -> HttpEntity(ContentTypes.`application/json`, res.toString)).recover {

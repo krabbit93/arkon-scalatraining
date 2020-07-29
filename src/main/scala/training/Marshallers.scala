@@ -2,6 +2,7 @@ package training
 
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Encoder, HCursor, Json}
+import training.domain._
 
 object Marshallers {
   implicit object GraphMarshall extends Decoder[GraphqlRequest] {
