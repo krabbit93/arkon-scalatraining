@@ -2,6 +2,7 @@ package training
 
 import sangria.schema._
 import training.domain._
+import training.entrypoint.ShopReductor
 
 object SchemaDefinition {
 
@@ -59,13 +60,13 @@ object SchemaDefinition {
     )
   )
 
-  val query = ObjectType("Query", fields[ShopRepository, Unit](
-    Field("activities", ListType(shop), resolve = _.ctx.getAll())
+  val query = ObjectType("Query", fields[ShopReductor, Unit](
+    Field("shops", ListType(shop), resolve = _.ctx.all())
   ))
 
   val mutation = ObjectType("Mutation",
-    fields[ShopRepository, Unit] (
-      Field("createUser", shop,
+    fields[ShopReductor, Unit](
+      Field("createShop", shop,
         arguments = List(
           Argument("businessName", StringType),
           Argument("name", StringType),

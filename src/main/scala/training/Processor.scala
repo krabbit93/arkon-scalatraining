@@ -8,6 +8,7 @@ import sangria.marshalling.InputUnmarshaller
 import sangria.marshalling.circe._
 import sangria.parser.QueryParser
 import training.Server.log
+import training.entrypoint.GraphqlShopReductor
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
@@ -17,7 +18,7 @@ object Processor {
     QueryParser.parse(json.query) match {
       case Success(document) => {
         complete(Executor.execute(
-          SchemaDefinition.schema, document, new ShopRepository,
+          SchemaDefinition.schema, document, new GraphqlShopReductor(new ShopRepository),
           variables = InputUnmarshaller.emptyMapVars,
           operationName = json.operationName
         ).map(res => OK -> HttpEntity(ContentTypes.`application/json`, res.toString)).recover {
