@@ -1,4 +1,4 @@
-package training
+package training.entrypoint
 
 import akka.http.scaladsl.model.StatusCodes.{BadRequest, InternalServerError, OK}
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
@@ -8,7 +8,7 @@ import sangria.marshalling.InputUnmarshaller
 import sangria.marshalling.circe._
 import sangria.parser.QueryParser
 import training.Server.log
-import training.entrypoint.GraphqlShopReductor
+import training.{GraphqlRequest, SchemaDefinition, ShopRepository}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}

@@ -4,10 +4,11 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import akka.http.scaladsl.model.StatusCodes.BadRequest
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
-import akka.http.scaladsl.server.Directives.{as, complete, entity, get, getFromResource, path, post, _}
+import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.circe.parser.decode
 import training.Marshallers._
+import training.entrypoint.Processor
 
 import scala.concurrent.ExecutionContextExecutor
 
