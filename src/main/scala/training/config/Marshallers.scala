@@ -1,8 +1,9 @@
-package training
+package training.config
 
 import io.circe.Decoder.Result
 import io.circe.{Decoder, Encoder, HCursor, Json}
-import training.domain._
+import training.GraphqlRequest
+import training.domain.CommercialActivity
 
 object Marshallers {
   implicit object GraphMarshall extends Decoder[GraphqlRequest] {

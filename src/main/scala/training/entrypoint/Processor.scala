@@ -8,7 +8,8 @@ import sangria.marshalling.InputUnmarshaller
 import sangria.marshalling.circe._
 import sangria.parser.QueryParser
 import training.Server.log
-import training.{GraphqlRequest, SchemaDefinition, ShopRepository}
+import training.config.SchemaDefinition
+import training.{GraphqlRequest, ShopRepository}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}

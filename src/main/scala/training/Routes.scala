@@ -7,7 +7,7 @@ import akka.http.scaladsl.model.{ContentTypes, HttpEntity}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.circe.parser.decode
-import training.Marshallers._
+import training.config.Marshallers._
 import training.entrypoint.Processor
 
 import scala.concurrent.ExecutionContextExecutor
