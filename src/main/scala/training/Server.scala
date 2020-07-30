@@ -37,7 +37,7 @@ object Server extends App {
       system.terminate()
   }
 
-  private def waitKeyForTermination() = {
+  private def waitKeyForTermination(): Unit = {
     log.info("Press enter key to stop...")
     StdIn.readLine()
     bindingFuture

@@ -6,7 +6,7 @@ import training.modules.shops.{CommercialActivity, Shop, ShopType, Stratum}
 
 object SchemaDefinition {
 
-  val activity = ObjectType(
+  val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
     "Activity",
     "A Commercial activity",
     fields[Unit, CommercialActivity](
@@ -15,7 +15,7 @@ object SchemaDefinition {
     )
   )
 
-  val shopType = ObjectType(
+  val shopType: ObjectType[Unit, ShopType] = ObjectType(
     "ShopType",
     "Type of shop",
     fields[Unit, ShopType](
@@ -24,7 +24,7 @@ object SchemaDefinition {
     )
   )
 
-  val stratum = ObjectType(
+  val stratum: ObjectType[Unit, Stratum] = ObjectType(
     "Stratum",
     "stratum",
     fields[Unit, Stratum](
@@ -33,7 +33,7 @@ object SchemaDefinition {
     )
   )
 
-  val position = ObjectType(
+  val position: ObjectType[Unit, (Long, Long)] = ObjectType(
     "Position",
     "A latitude and longitude",
     fields[Unit, (Long, Long)](
@@ -42,7 +42,7 @@ object SchemaDefinition {
     )
   )
 
-  val shop = ObjectType(
+  val shop: ObjectType[Unit, Shop] = ObjectType(
     "Shop",
     "A shop",
     fields[Unit, Shop](
@@ -60,14 +60,14 @@ object SchemaDefinition {
     )
   )
 
-  val query = ObjectType(
+  val query: ObjectType[ShopReductor, Unit] = ObjectType(
     "Query",
     fields[ShopReductor, Unit](
       Field("shops", ListType(shop), resolve = _.ctx.all())
     )
   )
 
-  val mutation = ObjectType(
+  val mutation: ObjectType[ShopReductor, Unit] = ObjectType(
     "Mutation",
     fields[ShopReductor, Unit](
       Field(
@@ -104,6 +104,6 @@ object SchemaDefinition {
     )
   )
 
-  val schema = Schema(query, Option(mutation))
+  val schema: Schema[ShopReductor, Unit] = Schema(query, Option(mutation))
 
 }

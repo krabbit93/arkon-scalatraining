@@ -21,10 +21,10 @@ object Routes {
         entity(as[String]) { jsonString =>
           {
             decode[GraphqlRequest](jsonString) match {
-              case Left(failure) => {
+              case Left(failure) =>
                 log.error("Error in reading: {}", failure)
                 complete(BadRequest -> HttpEntity(ContentTypes.`application/json`, "Error in request body"))
-              }
+
               case Right(json) => Processor(json)
             }
           }
