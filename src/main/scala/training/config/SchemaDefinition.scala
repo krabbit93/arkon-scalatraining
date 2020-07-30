@@ -74,7 +74,7 @@ object SchemaDefinition {
   private val positionArg: Argument[Map[String, Double]] = Argument(
     "position",
     InputObjectType[Map[String, Double]](
-      "position",
+      "Position",
       fields = List(
         InputField("latitude", FloatType),
         InputField("longitude", FloatType)
