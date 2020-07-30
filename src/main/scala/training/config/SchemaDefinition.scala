@@ -1,10 +1,14 @@
 package training.config
 
-import sangria.schema.{fields, Argument, Field, IntType, ListType, LongType, ObjectType, Schema, StringType}
+import sangria.marshalling.circe.circeDecoderFromInput
+import sangria.schema.{fields, Argument, Field, FloatType, InputField, InputObjectType, IntType, ListType, ObjectType, Schema, StringType}
 import training.entrypoint.ShopReductor
-import training.modules.shops.{CommercialActivity, Shop, ShopType, Stratum}
+import training.modules.shops._
 
 object SchemaDefinition {
+
+  implicit def mapToPosition(input: Map[String, Double]): Position =
+    Position(latitude = input("latitude"), longitude = input("longitude"))
 
   val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
     "Activity",
@@ -33,12 +37,12 @@ object SchemaDefinition {
     )
   )
 
-  val position: ObjectType[Unit, (Long, Long)] = ObjectType(
+  val position: ObjectType[Unit, Position] = ObjectType(
     "Position",
     "A latitude and longitude",
-    fields[Unit, (Long, Long)](
-      Field("latitude", LongType, resolve = _.value._1),
-      Field("longitude", LongType, resolve = _.value._2)
+    fields[Unit, Position](
+      Field("latitude", FloatType, resolve = _.value.latitude),
+      Field("longitude", FloatType, resolve = _.value.longitude)
     )
   )
 
@@ -67,6 +71,17 @@ object SchemaDefinition {
     )
   )
 
+  private val positionArg: Argument[Map[String, Double]] = Argument(
+    "position",
+    InputObjectType[Map[String, Double]](
+      "position",
+      fields = List(
+        InputField("latitude", FloatType),
+        InputField("longitude", FloatType)
+      )
+    )
+  )
+
   val mutation: ObjectType[ShopReductor, Unit] = ObjectType(
     "Mutation",
     fields[ShopReductor, Unit](
@@ -83,8 +98,7 @@ object SchemaDefinition {
           Argument("email", StringType),
           Argument("website", StringType),
           Argument("shopTypeId", IntType),
-          Argument("latitude", LongType),
-          Argument("longitude", LongType)
+          positionArg
         ),
         resolve = c => {
           c.ctx.createShop(
@@ -97,7 +111,7 @@ object SchemaDefinition {
             c.arg[String]("email"),
             c.arg[String]("website"),
             c.arg[Int]("shopTypeId"),
-            (c.arg[Long]("latitude"), c.arg[Long]("longitude"))
+            c.arg[Map[String, Double]](positionArg)
           )
         }
       )

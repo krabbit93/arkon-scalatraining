@@ -6,6 +6,8 @@ case class ShopType(id: Int, name: String)
 
 case class Stratum(id: Int, name: String)
 
+case class Position(latitude: Double, longitude: Double)
+
 case class Shop(
     id: Int,
     name: String,
@@ -17,5 +19,5 @@ case class Shop(
     email: String,
     website: String,
     shopType: ShopType,
-    position: (Long, Long)
+    position: Position
 )

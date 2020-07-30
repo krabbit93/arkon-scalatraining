@@ -12,7 +12,7 @@ class ShopRepository {
       email: String,
       website: String,
       shopTypeId: Int,
-      position: (Long, Long)
+      position: Position
   ): Shop = {
     Shop(
       1,

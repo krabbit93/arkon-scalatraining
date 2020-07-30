@@ -1,6 +1,6 @@
 package training.entrypoint
 
-import training.modules.shops.Shop
+import training.modules.shops.{Position, Shop}
 
 trait ShopReductor {
 
@@ -17,7 +17,7 @@ trait ShopReductor {
       email: String,
       website: String,
       shopTypeId: Int,
-      position: (Long, Long)
+      position: Position
   ): Shop
 
   /**

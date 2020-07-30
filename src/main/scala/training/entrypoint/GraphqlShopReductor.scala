@@ -1,6 +1,6 @@
 package training.entrypoint
 
-import training.modules.shops.{Shop, ShopRepository}
+import training.modules.shops.{Position, Shop, ShopRepository}
 
 final class GraphqlShopReductor(private val shopRepository: ShopRepository) extends ShopReductor {
 
@@ -14,7 +14,7 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository) exte
       email: String,
       website: String,
       shopTypeId: Int,
-      position: (Long, Long)
+      position: Position
   ): Shop = {
     shopRepository.createShop(
       businessName,
