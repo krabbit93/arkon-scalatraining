@@ -5,12 +5,13 @@ import akka.event.Logging
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.typesafe.config.ConfigFactory
+import io.circe.Json
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
-case class GraphqlRequest(query: String, operationName: Option[String], variables: Option[Map[String, String]])
+case class GraphqlRequest(query: String, operationName: Option[String], variables: Json)
 
 object Server extends App {
   implicit val system: ActorSystem = ActorSystem("sangria-server")

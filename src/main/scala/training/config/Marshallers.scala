@@ -1,9 +1,8 @@
 package training.config
 
 import io.circe.Decoder.Result
-import io.circe.{Decoder, Encoder, HCursor, Json}
+import io.circe.{Decoder, HCursor, Json}
 import training.GraphqlRequest
-import training.modules.shops.CommercialActivity
 
 object Marshallers {
   implicit object GraphMarshall extends Decoder[GraphqlRequest] {
@@ -18,19 +17,12 @@ object Marshallers {
         case Right(value) => Option(value)
       }
 
-      val variables = c.downField("variables").as[Map[String, String]] match {
-        case Left(_) => None
-        case Right(value) => Option(value)
+      val variables = c.downField("variables").as[Json] match {
+        case Left(_) => Json.fromFields(Map())
+        case Right(value) => value
       }
 
       Right(GraphqlRequest(query, operationName, variables))
     }
-  }
-
-  implicit object ShopEncoder extends Encoder[CommercialActivity] {
-    override def apply(a: CommercialActivity): Json = Json.obj(
-        ("id", Json.fromInt(a.id)),
-        ("name", Json.fromString(a.name))
-    )
   }
 }
