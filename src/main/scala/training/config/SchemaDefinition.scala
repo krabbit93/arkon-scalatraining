@@ -38,7 +38,7 @@ object SchemaDefinition {
   )
 
   val position: ObjectType[Unit, Position] = ObjectType(
-    "Position",
+    "PositionType",
     "A latitude and longitude",
     fields[Unit, Position](
       Field("latitude", FloatType, resolve = _.value.latitude),
