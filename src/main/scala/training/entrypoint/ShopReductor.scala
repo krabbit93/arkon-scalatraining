@@ -3,25 +3,24 @@ package training.entrypoint
 import training.modules.shops.{Position, Shop}
 
 trait ShopReductor {
+  def shopsInRadius(radius: Int, lat: Double, long: Double): List[Shop]
 
-  /**
-    * Create a shop with parameters obtained of mutation
-    */
+  def nearbyShops(limit: Int, lat: Double, long: Double): List[Shop]
+
+  def all(limit: Int, offset: Int): List[Shop]
+
+  def findShop(id: Int): Shop
+
   def createShop(
-      businessName: String,
+      businessName: Option[String],
       name: String,
-      activityId: Int,
-      stratumId: Int,
+      activityId: Option[Int],
+      stratumId: Option[Int],
       address: String,
-      phoneNumber: String,
-      email: String,
-      website: String,
-      shopTypeId: Int,
+      phoneNumber: Option[String],
+      email: Option[String],
+      website: Option[String],
+      shopTypeId: Option[Int],
       position: Position
-  ): Shop
-
-  /**
-    * Retrive list of all shop registered
-    */
-  def all(): List[Shop]
+  ): Int
 }

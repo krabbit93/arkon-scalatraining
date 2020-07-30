@@ -25,7 +25,9 @@ class ShopRepository {
       email,
       website,
       ShopType(shopTypeId, "Fake"),
-      position
+      position,
+      List(),
+      List()
     )
   }
 

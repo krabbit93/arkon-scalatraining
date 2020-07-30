@@ -19,5 +19,7 @@ case class Shop(
     email: String,
     website: String,
     shopType: ShopType,
-    position: Position
+    position: Position,
+    nearbyShops: List[Shop],
+    shopsInRadius: List[Shop]
 )

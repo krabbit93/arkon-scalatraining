@@ -1,14 +1,19 @@
 package training.config
 
-import sangria.marshalling.circe.circeDecoderFromInput
-import sangria.schema.{fields, Argument, Field, FloatType, InputField, InputObjectType, IntType, ListType, ObjectType, Schema, StringType}
+import com.typesafe.config.ConfigFactory
+import sangria.marshalling.circe._
+import sangria.schema.{fields, Argument, Field, FloatType, InputField, InputObjectType, IntType, ListType, ObjectType, OptionInputType, OptionType, Schema, StringType}
 import training.entrypoint.ShopReductor
 import training.modules.shops._
+
+case class ShopPayload(id: Int)
 
 object SchemaDefinition {
 
   implicit def mapToPosition(input: Map[String, Double]): Position =
     Position(latitude = input("latitude"), longitude = input("longitude"))
+
+  private val schemaConf = ConfigFactory.load("schema")
 
   val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
     "ActivityType",
@@ -37,47 +42,98 @@ object SchemaDefinition {
     )
   )
 
-  val position: ObjectType[Unit, Position] = ObjectType(
-    "PositionType",
-    "A latitude and longitude",
-    fields[Unit, Position](
-      Field("latitude", FloatType, resolve = _.value.latitude),
-      Field("longitude", FloatType, resolve = _.value.longitude)
-    )
-  )
-
   val shop: ObjectType[Unit, Shop] = ObjectType(
     "ShopType",
     "A shop",
-    fields[Unit, Shop](
-      Field("id", IntType, resolve = _.value.id),
-      Field("name", StringType, resolve = _.value.name),
-      Field("businessName", StringType, resolve = _.value.businessName),
-      Field("activity", activity, resolve = _.value.activity),
-      Field("stratum", stratum, resolve = _.value.stratum),
-      Field("address", StringType, resolve = _.value.address),
-      Field("phoneNumber", StringType, resolve = _.value.phoneNumber),
-      Field("email", StringType, resolve = _.value.email),
-      Field("website", StringType, resolve = _.value.website),
-      Field("shopType", shopType, resolve = _.value.shopType),
-      Field("position", position, resolve = _.value.position)
-    )
+    () =>
+      fields[Unit, Shop](
+        Field("id", IntType, resolve = _.value.id),
+        Field("name", StringType, resolve = _.value.name),
+        Field("businessName", OptionType(StringType), resolve = _.value.businessName),
+        Field("activity", OptionType(activity), resolve = _.value.activity),
+        Field("stratum", OptionType(stratum), resolve = _.value.stratum),
+        Field("address", StringType, resolve = _.value.address),
+        Field("phoneNumber", OptionType(StringType), resolve = _.value.phoneNumber),
+        Field("email", OptionType(StringType), resolve = _.value.email),
+        Field("website", OptionType(StringType), resolve = _.value.website),
+        Field("shopType", OptionType(shopType), resolve = _.value.shopType),
+        Field("lat", FloatType, resolve = _.value.position.latitude),
+        Field("long", FloatType, resolve = _.value.position.longitude),
+        Field(
+          "nearbyShops",
+          ListType(shop),
+          resolve = _.value.nearbyShops,
+          arguments = List(Argument("limit", IntType, defaultValue = schemaConf.getInt("defaultNearbyShops")))
+        ),
+        Field(
+          "shopsInRadius",
+          ListType(shop),
+          resolve = _.value.shopsInRadius,
+          arguments = List(Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")))
+        )
+      )
   )
 
   val query: ObjectType[ShopReductor, Unit] = ObjectType(
     "Query",
     fields[ShopReductor, Unit](
-      Field("shops", ListType(shop), resolve = _.ctx.all())
+      Field("shop", shop, resolve = c => c.ctx.findShop(c.arg[Int]("id")), arguments = List(Argument("id", IntType))),
+      Field(
+        "shops",
+        ListType(shop),
+        resolve = c => c.ctx.all(c.arg[Int]("limit"), c.arg[Int]("offset")),
+        arguments = List(
+          Argument("limit", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultLimit")),
+          Argument("offset", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultOffset"))
+        )
+      ),
+      Field(
+        "nearbyShops",
+        ListType(shop),
+        resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        arguments = List(
+          Argument("limit", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultLimit")),
+          Argument("lat", FloatType),
+          Argument("long", FloatType)
+        )
+      ),
+      Field(
+        "shopsInRadius",
+        ListType(shop),
+        resolve = c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        arguments = List(
+          Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")),
+          Argument("lat", FloatType),
+          Argument("long", FloatType)
+        )
+      )
     )
   )
 
-  private val positionArg: Argument[Map[String, Double]] = Argument(
-    "position",
-    InputObjectType[Map[String, Double]](
-      "Position",
+  val createShopPayload: ObjectType[Unit, ShopPayload] = ObjectType(
+    "CreateShopPayload",
+    fields[Unit, ShopPayload](
+      Field("id", IntType, resolve = _.value.id)
+    )
+  )
+
+  val createShopInput: Argument[Map[String, Any]] = Argument(
+    "input",
+    InputObjectType[Map[String, Any]](
+      "CreateShopInput",
       fields = List(
-        InputField("latitude", FloatType),
-        InputField("longitude", FloatType)
+        InputField("id", IntType),
+        InputField("name", StringType),
+        InputField("businessName", OptionInputType(StringType)),
+        InputField("activity", OptionInputType(IntType)),
+        InputField("stratum", OptionInputType(IntType)),
+        InputField("address", StringType),
+        InputField("phoneNumber", OptionInputType(StringType)),
+        InputField("email", OptionInputType(StringType)),
+        InputField("website", OptionInputType(StringType)),
+        InputField("shopType", OptionInputType(IntType)),
+        InputField("lat", FloatType),
+        InputField("long", FloatType)
       )
     )
   )
@@ -87,37 +143,28 @@ object SchemaDefinition {
     fields[ShopReductor, Unit](
       Field(
         "createShop",
-        shop,
-        arguments = List(
-          Argument("businessName", StringType),
-          Argument("name", StringType),
-          Argument("activityId", IntType),
-          Argument("stratumId", IntType),
-          Argument("address", StringType),
-          Argument("phoneNumber", StringType),
-          Argument("email", StringType),
-          Argument("website", StringType),
-          Argument("shopTypeId", IntType),
-          positionArg
-        ),
+        createShopPayload,
+        arguments = List(createShopInput),
         resolve = c => {
-          c.ctx.createShop(
-            c.arg[String]("businessName"),
-            c.arg[String]("name"),
-            c.arg[Int]("activityId"),
-            c.arg[Int]("stratumId"),
-            c.arg[String]("address"),
-            c.arg[String]("phoneNumber"),
-            c.arg[String]("email"),
-            c.arg[String]("website"),
-            c.arg[Int]("shopTypeId"),
-            c.arg[Map[String, Double]](positionArg)
+          val values = c.arg[Map[String, Any]]("input")
+          val id = c.ctx.createShop(
+            values.getOrElse("businessName", None).asInstanceOf[Option[String]],
+            values("name").asInstanceOf[String],
+            values.getOrElse("activity", None).asInstanceOf[Option[Int]],
+            values.getOrElse("stratum", None).asInstanceOf[Option[Int]],
+            values("address").asInstanceOf[String],
+            values.getOrElse("phoneNumber", None).asInstanceOf[Option[String]],
+            values.getOrElse("email", None).asInstanceOf[Option[String]],
+            values.getOrElse("website", None).asInstanceOf[Option[String]],
+            values.getOrElse("shopType", None).asInstanceOf[Option[Int]],
+            Position(values("lat").asInstanceOf[Double], values("long").asInstanceOf[Double])
           )
+          ShopPayload(id)
         }
       )
     )
   )
 
-  val schema: Schema[ShopReductor, Unit] = Schema(query, Option(mutation))
+  val schema: Schema[ShopReductor, Unit] = Schema(query, Some(mutation))
 
 }
