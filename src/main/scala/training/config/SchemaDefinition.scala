@@ -1,6 +1,6 @@
 package training.config
 
-import sangria.schema.{Argument, Field, IntType, ListType, LongType, ObjectType, Schema, StringType, fields}
+import sangria.schema.{fields, Argument, Field, IntType, ListType, LongType, ObjectType, Schema, StringType}
 import training.entrypoint.ShopReductor
 import training.modules.shops.{CommercialActivity, Shop, ShopType, Stratum}
 
@@ -60,13 +60,19 @@ object SchemaDefinition {
     )
   )
 
-  val query = ObjectType("Query", fields[ShopReductor, Unit](
-    Field("shops", ListType(shop), resolve = _.ctx.all())
-  ))
-
-  val mutation = ObjectType("Mutation",
+  val query = ObjectType(
+    "Query",
     fields[ShopReductor, Unit](
-      Field("createShop", shop,
+      Field("shops", ListType(shop), resolve = _.ctx.all())
+    )
+  )
+
+  val mutation = ObjectType(
+    "Mutation",
+    fields[ShopReductor, Unit](
+      Field(
+        "createShop",
+        shop,
         arguments = List(
           Argument("businessName", StringType),
           Argument("name", StringType),
@@ -93,8 +99,10 @@ object SchemaDefinition {
             c.arg[Int]("shopTypeId"),
             (c.arg[Long]("latitude"), c.arg[Long]("longitude"))
           )
-        })
-    ))
+        }
+      )
+    )
+  )
 
   val schema = Schema(query, Option(mutation))
 

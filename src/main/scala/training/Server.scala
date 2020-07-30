@@ -14,17 +14,17 @@ import scala.util.{Failure, Success}
 case class GraphqlRequest(query: String, operationName: Option[String], variables: Json)
 
 object Server extends App {
-  implicit val system: ActorSystem = ActorSystem("sangria-server")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val system: ActorSystem                        = ActorSystem("sangria-server")
+  implicit val materializer: ActorMaterializer            = ActorMaterializer()
   implicit val executionContext: ExecutionContextExecutor = system.dispatcher
 
   val log = Logging(system.eventStream, "sangria-server")
 
   val serverConfig = ConfigFactory.load("server")
-  val host = serverConfig.getString("host")
-  val port = serverConfig.getInt("port")
+  val host         = serverConfig.getString("host")
+  val port         = serverConfig.getInt("port")
 
-  val route = Routes.all()
+  val route         = Routes.all()
   val bindingFuture = Http().bindAndHandle(route, host, port)
 
   bindingFuture.onComplete {
