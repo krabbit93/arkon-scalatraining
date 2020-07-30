@@ -11,7 +11,7 @@ object SchemaDefinition {
     Position(latitude = input("latitude"), longitude = input("longitude"))
 
   val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
-    "Activity",
+    "ActivityType",
     "A Commercial activity",
     fields[Unit, CommercialActivity](
       Field("id", IntType, resolve = _.value.id),
@@ -20,7 +20,7 @@ object SchemaDefinition {
   )
 
   val shopType: ObjectType[Unit, ShopType] = ObjectType(
-    "ShopType",
+    "ShopTypeType",
     "Type of shop",
     fields[Unit, ShopType](
       Field("id", IntType, resolve = _.value.id),
@@ -29,7 +29,7 @@ object SchemaDefinition {
   )
 
   val stratum: ObjectType[Unit, Stratum] = ObjectType(
-    "Stratum",
+    "StratumType",
     "stratum",
     fields[Unit, Stratum](
       Field("id", IntType, resolve = _.value.id),
@@ -47,7 +47,7 @@ object SchemaDefinition {
   )
 
   val shop: ObjectType[Unit, Shop] = ObjectType(
-    "Shop",
+    "ShopType",
     "A shop",
     fields[Unit, Shop](
       Field("id", IntType, resolve = _.value.id),
