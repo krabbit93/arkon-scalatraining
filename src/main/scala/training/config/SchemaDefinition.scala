@@ -9,10 +9,6 @@ import training.modules.shops._
 case class ShopPayload(id: Int)
 
 object SchemaDefinition {
-
-  implicit def mapToPosition(input: Map[String, Double]): Position =
-    Position(latitude = input("latitude"), longitude = input("longitude"))
-
   private val schemaConf = ConfigFactory.load("schema")
 
   val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
