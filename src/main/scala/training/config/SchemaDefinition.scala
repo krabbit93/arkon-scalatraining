@@ -62,14 +62,16 @@ object SchemaDefinition {
         Field(
           "nearbyShops",
           ListType(shop),
-          resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.value.position.latitude, c.value.position.longitude),
+          resolve = c =>
+            c.ctx.nearbyShops(c.arg[Int]("limit"), c.value.position.latitude, c.value.position.longitude, c.value.id),
           arguments = List(Argument("limit", IntType, defaultValue = schemaConf.getInt("defaultNearbyShops")))
         ),
         Field(
           "shopsInRadius",
           ListType(shop),
-          resolve =
-            c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.value.position.latitude, c.value.position.longitude),
+          resolve = c =>
+            c.ctx
+              .shopsInRadius(c.arg[Int]("radius"), c.value.position.latitude, c.value.position.longitude, c.value.id),
           arguments = List(Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")))
         )
       )
@@ -91,7 +93,7 @@ object SchemaDefinition {
       Field(
         "nearbyShops",
         ListType(shop),
-        resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.arg[Double]("lat"), c.arg[Double]("long"), -1),
         arguments = List(
           Argument("limit", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultLimit")),
           Argument("lat", FloatType),
@@ -101,7 +103,7 @@ object SchemaDefinition {
       Field(
         "shopsInRadius",
         ListType(shop),
-        resolve = c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        resolve = c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.arg[Double]("lat"), c.arg[Double]("long"), -1),
         arguments = List(
           Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")),
           Argument("lat", FloatType),

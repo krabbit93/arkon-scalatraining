@@ -51,4 +51,31 @@ class ShopRepository() {
       case None        => throw new IllegalStateException()
     }
   }
+
+  def nearbyShops(limit: Int, lat: Double, long: Double, id: Int = -1): List[Shop] =
+    sql"""
+    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
+    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long
+    from shop
+    where id != ${id}
+    order by position <-> ST_GeographyFromText('POINT(' || ${lat} || ' ' || ${long} || ')')
+    limit ${limit}
+    """
+      .query[Shop]
+      .to[List]
+      .transact(DataAccess.xa)
+      .unsafeRunSync()
+
+  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Int = -1): List[Shop] =
+    sql"""
+        select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
+        st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
+        where st_dwithin(ST_GeographyFromText('POINT(' || ${lat} || ' ' || ${long} || ')'), position, ${radius})
+        and id != ${id}
+        order by st_distance(ST_GeographyFromText('POINT(' || ${lat} || ' ' || ${long} || ')'), position)
+     """
+      .query[Shop]
+      .to[List]
+      .transact(DataAccess.xa)
+      .unsafeRunSync()
 }
