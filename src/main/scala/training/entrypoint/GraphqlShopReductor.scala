@@ -7,7 +7,8 @@ import training.modules.shops._
 final class GraphqlShopReductor(
     private val shopRepository: ShopRepository,
     private val shopTypeRepository: ShopTypeRepository,
-    private val stratumRepository: StratumRepository
+    private val stratumRepository: StratumRepository,
+    private val commercialActivityRepository: CommercialActivityRepository
 )(implicit system: ActorSystem)
     extends ShopReductor {
   private val log = Logging(system.eventStream, "reductor")
@@ -56,5 +57,5 @@ final class GraphqlShopReductor(
 
   override def findStratum(stratumId: Int): Stratum = stratumRepository.find(stratumId)
 
-  override def findActivity(activityId: Int): CommercialActivity = CommercialActivity(1, "a Comercial")
+  override def findActivity(activityId: Int): CommercialActivity = commercialActivityRepository.find(activityId)
 }
