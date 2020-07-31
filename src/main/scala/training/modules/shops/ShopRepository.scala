@@ -39,8 +39,12 @@ class ShopRepository()(implicit executionContext: ExecutionContext) {
       .unsafeRunSync()
   }
 
-  def getAll(): List[Shop] =
-    sql"select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop"
+  def getAll(limit: Int, offset: Int): List[Shop] =
+    sql"""
+    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
+    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
+    limit ${limit} offset ${offset}
+    """
       .query[Shop]
       .to[List]
       .transact(xa)

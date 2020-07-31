@@ -15,7 +15,7 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository)(impl
 
   override def nearbyShops(limit: Int, lat: Double, long: Double): List[Shop] = List()
 
-  override def all(limit: Int, offset: Int): List[Shop] = shopRepository.getAll()
+  override def all(limit: Int, offset: Int): List[Shop] = shopRepository.getAll(limit, offset)
 
   override def findShop(id: Int): Shop =
     Shop(
