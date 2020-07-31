@@ -3,13 +3,11 @@ package training.modules.shops
 import cats.effect.IO
 import doobie.implicits._
 import doobie.util.transactor.Transactor
-import doobie.postgres.pgisimplicits._
-import doobie.postgres._
-import doobie.postgres.implicits._
 
 import scala.concurrent.ExecutionContext
 
 class ShopRepository()(implicit executionContext: ExecutionContext) {
+
   implicit val cs = IO.contextShift(executionContext)
 
   val xa = Transactor.fromDriverManager[IO](
@@ -49,4 +47,18 @@ class ShopRepository()(implicit executionContext: ExecutionContext) {
       .to[List]
       .transact(xa)
       .unsafeRunSync()
+
+  def find(id: Int): Shop = {
+    sql"""
+    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
+    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop where id = ${id};
+    """
+      .query[Shop]
+      .option
+      .transact(xa)
+      .unsafeRunSync() match {
+      case Some(value) => value
+      case None        => throw new IllegalStateException()
+    }
+  }
 }
