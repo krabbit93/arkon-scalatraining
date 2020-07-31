@@ -52,9 +52,9 @@ final class GraphqlShopReductor(
     id
   }
 
-  override def getShopType(shopTypeId: Int): ShopType = shopTypeRepository.find(shopTypeId)
+  override def getShopType(shopTypeId: Int): Option[ShopType] = shopTypeRepository.find(shopTypeId)
 
-  override def findStratum(stratumId: Int): Stratum = stratumRepository.find(stratumId)
+  override def findStratum(stratumId: Int): Option[Stratum] = stratumRepository.find(stratumId)
 
-  override def findActivity(activityId: Int): CommercialActivity = commercialActivityRepository.find(activityId)
+  override def findActivity(activityId: Int): Option[CommercialActivity] = commercialActivityRepository.find(activityId)
 }

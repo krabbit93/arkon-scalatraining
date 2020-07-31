@@ -3,11 +3,11 @@ package training.entrypoint
 import training.modules.shops._
 
 trait ShopReductor {
-  def getShopType(shopTypeId: Int): ShopType
+  def getShopType(shopTypeId: Int): Option[ShopType]
 
-  def findStratum(stratumId: Int): Stratum
+  def findStratum(stratumId: Int): Option[Stratum]
 
-  def findActivity(activityId: Int): CommercialActivity
+  def findActivity(activityId: Int): Option[CommercialActivity]
 
   def shopsInRadius(radius: Int, lat: Double, long: Double, id: Int): List[Shop]
 

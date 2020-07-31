@@ -46,13 +46,37 @@ object SchemaDefinition {
         Field("id", IntType, resolve = _.value.id),
         Field("name", StringType, resolve = _.value.name),
         Field("businessName", OptionType(StringType), resolve = _.value.businessName),
-        Field("activity", OptionType(activity), resolve = c => c.ctx.findActivity(c.value.activityId)),
-        Field("stratum", OptionType(stratum), resolve = c => c.ctx.findStratum(c.value.stratumId)),
+        Field(
+          "activity",
+          OptionType(activity),
+          resolve = c =>
+            c.value.activityId match {
+              case Some(value) => c.ctx.findActivity(value)
+              case None        => None
+            }
+        ),
+        Field(
+          "stratum",
+          OptionType(stratum),
+          resolve = c =>
+            c.value.stratumId match {
+              case Some(value) => c.ctx.findStratum(value)
+              case None        => None
+            }
+        ),
         Field("address", StringType, resolve = _.value.address),
         Field("phoneNumber", OptionType(StringType), resolve = _.value.phoneNumber),
         Field("email", OptionType(StringType), resolve = _.value.email),
         Field("website", OptionType(StringType), resolve = _.value.website),
-        Field("shopType", OptionType(shopType), resolve = c => c.ctx.getShopType(c.value.shopTypeId)),
+        Field(
+          "shopType",
+          OptionType(shopType),
+          resolve = c =>
+            c.value.shopTypeId match {
+              case Some(value) => c.ctx.getShopType(value)
+              case None        => None
+            }
+        ),
         Field("lat", FloatType, resolve = _.value.position.latitude),
         Field("long", FloatType, resolve = _.value.position.longitude),
         Field(
