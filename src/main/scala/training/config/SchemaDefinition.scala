@@ -42,33 +42,34 @@ object SchemaDefinition {
     )
   )
 
-  val shop: ObjectType[Unit, Shop] = ObjectType(
+  val shop: ObjectType[ShopReductor, Shop] = ObjectType(
     "ShopType",
     "A shop",
     () =>
-      fields[Unit, Shop](
+      fields[ShopReductor, Shop](
         Field("id", IntType, resolve = _.value.id),
         Field("name", StringType, resolve = _.value.name),
         Field("businessName", OptionType(StringType), resolve = _.value.businessName),
-        Field("activity", OptionType(activity), resolve = _.value.activity),
-        Field("stratum", OptionType(stratum), resolve = _.value.stratum),
+        Field("activity", OptionType(activity), resolve = c => c.ctx.findActivity(c.value.activityId)),
+        Field("stratum", OptionType(stratum), resolve = c => c.ctx.findStratum(c.value.stratumId)),
         Field("address", StringType, resolve = _.value.address),
         Field("phoneNumber", OptionType(StringType), resolve = _.value.phoneNumber),
         Field("email", OptionType(StringType), resolve = _.value.email),
         Field("website", OptionType(StringType), resolve = _.value.website),
-        Field("shopType", OptionType(shopType), resolve = _.value.shopType),
+        Field("shopType", OptionType(shopType), resolve = c => c.ctx.getShopType(c.value.shopTypeId)),
         Field("lat", FloatType, resolve = _.value.position.latitude),
         Field("long", FloatType, resolve = _.value.position.longitude),
         Field(
           "nearbyShops",
           ListType(shop),
-          resolve = _.value.nearbyShops,
+          resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.value.position.latitude, c.value.position.longitude),
           arguments = List(Argument("limit", IntType, defaultValue = schemaConf.getInt("defaultNearbyShops")))
         ),
         Field(
           "shopsInRadius",
           ListType(shop),
-          resolve = _.value.shopsInRadius,
+          resolve =
+            c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.value.position.latitude, c.value.position.longitude),
           arguments = List(Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")))
         )
       )

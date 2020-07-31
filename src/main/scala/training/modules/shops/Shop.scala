@@ -12,14 +12,12 @@ case class Shop(
     id: Int,
     name: String,
     businessName: String,
-    activity: CommercialActivity,
-    stratum: Stratum,
+    activityId: Int,
+    stratumId: Int,
     address: String,
     phoneNumber: String,
     email: String,
     website: String,
-    shopType: ShopType,
-    position: Position,
-    nearbyShops: List[Shop],
-    shopsInRadius: List[Shop]
+    shopTypeId: Int,
+    position: Position
 )

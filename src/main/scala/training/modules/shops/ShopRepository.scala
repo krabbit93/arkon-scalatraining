@@ -18,16 +18,14 @@ class ShopRepository {
       1,
       name,
       businessName,
-      CommercialActivity(activityId, "Fake"),
-      Stratum(stratumId, "Fake"),
+      1,
+      2,
       address,
       phoneNumber,
       email,
       website,
-      ShopType(shopTypeId, "Fake"),
-      position,
-      List(),
-      List()
+      3,
+      position
     )
   }
 

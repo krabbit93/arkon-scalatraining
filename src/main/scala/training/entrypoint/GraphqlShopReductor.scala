@@ -1,9 +1,17 @@
 package training.entrypoint
 
+import akka.actor.ActorSystem
+import akka.event.Logging
 import training.modules.shops._
 
-final class GraphqlShopReductor(private val shopRepository: ShopRepository) extends ShopReductor {
-  override def shopsInRadius(radius: Int, lat: Double, long: Double): List[Shop] = List()
+final class GraphqlShopReductor(private val shopRepository: ShopRepository)(implicit system: ActorSystem)
+    extends ShopReductor {
+  private val log = Logging(system.eventStream, "reductor")
+
+  override def shopsInRadius(radius: Int, lat: Double, long: Double): List[Shop] = {
+    log.info("Se buscan las cercanas")
+    List()
+  }
 
   override def nearbyShops(limit: Int, lat: Double, long: Double): List[Shop] = List()
 
@@ -14,16 +22,14 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository) exte
       id = 1,
       name = "fake",
       businessName = "fake",
-      activity = CommercialActivity(1, "Fake"),
-      stratum = Stratum(1, "Fake"),
+      activityId = 1,
+      stratumId = 1,
       address = "fake",
       phoneNumber = "31241232",
       email = "sagt@asda.com",
       website = "algo.com",
-      shopType = ShopType(1, "dasdas"),
-      position = Position(3.4523453, 3.3454534),
-      nearbyShops = List(),
-      shopsInRadius = List()
+      shopTypeId = 1,
+      position = Position(3.4523453, 3.3454534)
     )
 
   override def createShop(
@@ -38,4 +44,13 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository) exte
       shopTypeId: Option[Int],
       position: Position
   ): Int = 1
+
+  override def getShopType(shopTypeId: Int): ShopType = ShopType(1, "12341")
+
+  override def findStratum(stratumId: Int): Stratum = {
+    log.info("Se realiza la consulta de stratum")
+    Stratum(3, "Stratum")
+  }
+
+  override def findActivity(activityId: Int): CommercialActivity = CommercialActivity(1, "a Comercial")
 }
