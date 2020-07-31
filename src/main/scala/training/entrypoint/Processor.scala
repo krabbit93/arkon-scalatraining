@@ -11,7 +11,7 @@ import sangria.marshalling.circe._
 import sangria.parser.QueryParser
 import training.GraphqlRequest
 import training.config.SchemaDefinition
-import training.modules.shops.{ShopRepository, ShopTypeRepository}
+import training.modules.shops.{ShopRepository, ShopTypeRepository, StratumRepository}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
@@ -30,7 +30,7 @@ object Processor {
             .execute(
               SchemaDefinition.schema,
               document,
-              new GraphqlShopReductor(new ShopRepository, new ShopTypeRepository),
+              new GraphqlShopReductor(new ShopRepository, new ShopTypeRepository, new StratumRepository),
               variables = json.variables,
               operationName = json.operationName
             )
