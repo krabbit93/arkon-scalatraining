@@ -1,7 +1,5 @@
 package training.modules.shops
 
-import org.postgis.PGgeometry
-
 case class CommercialActivity(id: Int, name: String)
 
 case class ShopType(id: Int, name: String)
