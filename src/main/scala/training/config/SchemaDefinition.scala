@@ -149,6 +149,7 @@ object SchemaDefinition {
         resolve = c => {
           val values = c.arg[Map[String, Any]]("input")
           val id = c.ctx.createShop(
+            values("id").asInstanceOf[Int],
             values.getOrElse("businessName", None).asInstanceOf[Option[String]],
             values("name").asInstanceOf[String],
             values.getOrElse("activity", None).asInstanceOf[Option[Int]],

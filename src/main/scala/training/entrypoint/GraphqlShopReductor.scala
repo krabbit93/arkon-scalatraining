@@ -15,7 +15,7 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository)(impl
 
   override def nearbyShops(limit: Int, lat: Double, long: Double): List[Shop] = List()
 
-  override def all(limit: Int, offset: Int): List[Shop] = List()
+  override def all(limit: Int, offset: Int): List[Shop] = shopRepository.getAll()
 
   override def findShop(id: Int): Shop =
     Shop(
@@ -33,6 +33,7 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository)(impl
     )
 
   override def createShop(
+      id: Int,
       businessName: Option[String],
       name: String,
       activityId: Option[Int],
@@ -43,7 +44,22 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository)(impl
       website: Option[String],
       shopTypeId: Option[Int],
       position: Position
-  ): Int = 1
+  ): Int = {
+    shopRepository.createShop(
+      id = id,
+      businessName = businessName,
+      name = name,
+      activityId = activityId,
+      stratumId = stratumId,
+      address = address,
+      phoneNumber = phoneNumber,
+      email = email,
+      website = website,
+      shopTypeId = shopTypeId,
+      position = position
+    )
+    id
+  }
 
   override def getShopType(shopTypeId: Int): ShopType = ShopType(1, "12341")
 

@@ -1,35 +1,48 @@
 package training.modules.shops
 
-class ShopRepository {
+import cats.effect.IO
+import doobie.implicits._
+import doobie.util.transactor.Transactor
+import doobie.postgres.pgisimplicits._
+import doobie.postgres._
+import doobie.postgres.implicits._
+
+import scala.concurrent.ExecutionContext
+
+class ShopRepository()(implicit executionContext: ExecutionContext) {
+  implicit val cs = IO.contextShift(executionContext)
+
+  val xa = Transactor.fromDriverManager[IO](
+    "org.postgresql.Driver",
+    "jdbc:postgresql://localhost:5432/shops",
+    "admin",
+    "admin123"
+  )
 
   def createShop(
-      businessName: String,
+      id: Int,
+      businessName: Option[String],
       name: String,
-      activityId: Int,
-      stratumId: Int,
+      activityId: Option[Int],
+      stratumId: Option[Int],
       address: String,
-      phoneNumber: String,
-      email: String,
-      website: String,
-      shopTypeId: Int,
+      phoneNumber: Option[String],
+      email: Option[String],
+      website: Option[String],
+      shopTypeId: Option[Int],
       position: Position
-  ): Shop = {
-    Shop(
-      1,
-      name,
-      businessName,
-      1,
-      2,
-      address,
-      phoneNumber,
-      email,
-      website,
-      3,
-      position
-    )
+  ): Unit = {
+    sql"""insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
+          values (${id}, ${name}, ${businessName}, ${activityId}, ${stratumId}, ${address}, ${phoneNumber}, ${email}, ${website}, ${shopTypeId},
+          ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update.run
+      .transact(xa)
+      .unsafeRunSync()
   }
 
-  def getAll(): List[Shop] = {
-    List()
-  }
+  def getAll(): List[Shop] =
+    sql"select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop"
+      .query[Shop]
+      .to[List]
+      .transact(xa)
+      .unsafeRunSync()
 }

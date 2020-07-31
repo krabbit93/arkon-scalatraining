@@ -18,6 +18,7 @@ trait ShopReductor {
   def findShop(id: Int): Shop
 
   def createShop(
+      id: Int,
       businessName: Option[String],
       name: String,
       activityId: Option[Int],
