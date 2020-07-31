@@ -21,7 +21,7 @@ final class GraphqlShopReductor(
 
   override def all(limit: Int, offset: Int): List[Shop] = shopRepository.getAll(limit, offset)
 
-  override def findShop(id: Int): Shop = shopRepository.find(id)
+  override def findShop(id: Int): Option[Shop] = shopRepository.find(id)
 
   override def createShop(
       id: Int,

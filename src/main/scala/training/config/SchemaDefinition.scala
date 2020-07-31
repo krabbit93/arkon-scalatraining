@@ -110,7 +110,12 @@ object SchemaDefinition {
   val query: ObjectType[ShopReductor, Unit] = ObjectType(
     "Query",
     fields[ShopReductor, Unit](
-      Field("shop", shop, resolve = c => c.ctx.findShop(c.arg[Int]("id")), arguments = List(Argument("id", IntType))),
+      Field(
+        "shop",
+        OptionType(shop),
+        resolve = c => c.ctx.findShop(c.arg[Int]("id")),
+        arguments = List(Argument("id", IntType))
+      ),
       Field(
         "shops",
         ListType(shop),

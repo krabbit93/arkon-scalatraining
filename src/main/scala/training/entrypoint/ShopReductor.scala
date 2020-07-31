@@ -15,7 +15,7 @@ trait ShopReductor {
 
   def all(limit: Int, offset: Int): List[Shop]
 
-  def findShop(id: Int): Shop
+  def findShop(id: Int): Option[Shop]
 
   def createShop(
       id: Int,
