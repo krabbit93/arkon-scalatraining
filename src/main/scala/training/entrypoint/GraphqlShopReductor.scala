@@ -13,10 +13,10 @@ final class GraphqlShopReductor(
     extends ShopReductor {
   private val log = Logging(system.eventStream, "reductor")
 
-  override def shopsInRadius(radius: Int, lat: Double, long: Double, id: Int): List[Shop] =
+  override def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop] =
     shopRepository.shopsInRadius(radius, lat, long, id)
 
-  override def nearbyShops(limit: Int, lat: Double, long: Double, id: Int): List[Shop] =
+  override def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop] =
     shopRepository.nearbyShops(limit, lat, long, id)
 
   override def all(limit: Int, offset: Int): List[Shop] = shopRepository.getAll(limit, offset)

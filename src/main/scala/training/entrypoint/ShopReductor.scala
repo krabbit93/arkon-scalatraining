@@ -9,9 +9,9 @@ trait ShopReductor {
 
   def findActivity(activityId: Int): Option[CommercialActivity]
 
-  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Int): List[Shop]
+  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop]
 
-  def nearbyShops(limit: Int, lat: Double, long: Double, id: Int): List[Shop]
+  def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop]
 
   def all(limit: Int, offset: Int): List[Shop]
 
