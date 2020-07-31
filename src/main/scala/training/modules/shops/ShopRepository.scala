@@ -1,21 +1,11 @@
 package training.modules.shops
 
-import cats.effect.IO
+import cats.effect.{ContextShift, IO}
 import doobie.implicits._
-import doobie.util.transactor.Transactor
 
 import scala.concurrent.ExecutionContext
 
-class ShopRepository()(implicit executionContext: ExecutionContext) {
-
-  implicit val cs = IO.contextShift(executionContext)
-
-  val xa = Transactor.fromDriverManager[IO](
-    "org.postgresql.Driver",
-    "jdbc:postgresql://localhost:5432/shops",
-    "admin",
-    "admin123"
-  )
+class ShopRepository() {
 
   def createShop(
       id: Int,
@@ -33,7 +23,7 @@ class ShopRepository()(implicit executionContext: ExecutionContext) {
     sql"""insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
           values (${id}, ${name}, ${businessName}, ${activityId}, ${stratumId}, ${address}, ${phoneNumber}, ${email}, ${website}, ${shopTypeId},
           ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update.run
-      .transact(xa)
+      .transact(DataAccess.xa)
       .unsafeRunSync()
   }
 
@@ -45,7 +35,7 @@ class ShopRepository()(implicit executionContext: ExecutionContext) {
     """
       .query[Shop]
       .to[List]
-      .transact(xa)
+      .transact(DataAccess.xa)
       .unsafeRunSync()
 
   def find(id: Int): Shop = {
@@ -55,7 +45,7 @@ class ShopRepository()(implicit executionContext: ExecutionContext) {
     """
       .query[Shop]
       .option
-      .transact(xa)
+      .transact(DataAccess.xa)
       .unsafeRunSync() match {
       case Some(value) => value
       case None        => throw new IllegalStateException()

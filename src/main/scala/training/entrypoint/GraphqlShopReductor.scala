@@ -4,7 +4,10 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import training.modules.shops._
 
-final class GraphqlShopReductor(private val shopRepository: ShopRepository)(implicit system: ActorSystem)
+final class GraphqlShopReductor(
+    private val shopRepository: ShopRepository,
+    private val shopTypeRepository: ShopTypeRepository
+)(implicit system: ActorSystem)
     extends ShopReductor {
   private val log = Logging(system.eventStream, "reductor")
 
@@ -48,7 +51,7 @@ final class GraphqlShopReductor(private val shopRepository: ShopRepository)(impl
     id
   }
 
-  override def getShopType(shopTypeId: Int): ShopType = ShopType(1, "12341")
+  override def getShopType(shopTypeId: Int): ShopType = shopTypeRepository.find(shopTypeId)
 
   override def findStratum(stratumId: Int): Stratum = {
     log.info("Se realiza la consulta de stratum")
