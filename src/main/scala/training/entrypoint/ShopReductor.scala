@@ -1,21 +1,22 @@
 package training.entrypoint
 
+import cats.effect.IO
 import training.modules.shops._
 
 trait ShopReductor {
-  def getShopType(shopTypeId: Int): Option[ShopType]
+  def getShopType(shopTypeId: Int): IO[Option[ShopType]]
 
-  def findStratum(stratumId: Int): Option[Stratum]
+  def findStratum(stratumId: Int): IO[Option[Stratum]]
 
-  def findActivity(activityId: Int): Option[CommercialActivity]
+  def findActivity(activityId: Int): IO[Option[CommercialActivity]]
 
-  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop]
+  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int] = None): IO[List[Shop]]
 
-  def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int] = None): List[Shop]
+  def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int] = None): IO[List[Shop]]
 
-  def all(limit: Int, offset: Int): List[Shop]
+  def all(limit: Int, offset: Int): IO[List[Shop]]
 
-  def findShop(id: Int): Option[Shop]
+  def findShop(id: Int): IO[Option[Shop]]
 
   def createShop(
       id: Int,
@@ -29,5 +30,5 @@ trait ShopReductor {
       website: Option[String],
       shopTypeId: Option[Int],
       position: Position
-  ): Int
+  ): IO[Int]
 }

@@ -1,15 +1,24 @@
 package training.config
 
+import cats.effect.{IO, LiftIO}
 import com.typesafe.config.ConfigFactory
 import sangria.marshalling.circe._
 import sangria.schema.{fields, Argument, Field, FloatType, InputField, InputObjectType, IntType, ListType, ObjectType, OptionInputType, OptionType, Schema, StringType}
 import training.entrypoint.ShopReductor
 import training.modules.shops._
 
+import scala.concurrent.Future
+
 case class ShopPayload(id: Int)
 
 object SchemaDefinition {
   private val schemaConf = ConfigFactory.load("schema")
+
+  implicit val toOption: LiftIO[Future] = new LiftIO[Future] {
+    override def liftIO[A](ioa: IO[A]): Future[A] = {
+      ioa.unsafeToFuture()
+    }
+  }
 
   val activity: ObjectType[Unit, CommercialActivity] = ObjectType(
     "ActivityType",
@@ -50,19 +59,19 @@ object SchemaDefinition {
           "activity",
           OptionType(activity),
           resolve = c =>
-            c.value.activityId match {
+            (c.value.activityId match {
               case Some(value) => c.ctx.findActivity(value)
-              case None        => None
-            }
+              case None        => IO(None)
+            }).to[Future]
         ),
         Field(
           "stratum",
           OptionType(stratum),
           resolve = c =>
-            c.value.stratumId match {
+            (c.value.stratumId match {
               case Some(value) => c.ctx.findStratum(value)
-              case None        => None
-            }
+              case None        => IO(None)
+            }).to[Future]
         ),
         Field("address", StringType, resolve = _.value.address),
         Field("phoneNumber", OptionType(StringType), resolve = _.value.phoneNumber),
@@ -72,10 +81,10 @@ object SchemaDefinition {
           "shopType",
           OptionType(shopType),
           resolve = c =>
-            c.value.shopTypeId match {
+            (c.value.shopTypeId match {
               case Some(value) => c.ctx.getShopType(value)
-              case None        => None
-            }
+              case None        => IO(None)
+            }).to[Future]
         ),
         Field("lat", FloatType, resolve = _.value.position.latitude),
         Field("long", FloatType, resolve = _.value.position.longitude),
@@ -83,12 +92,14 @@ object SchemaDefinition {
           "nearbyShops",
           ListType(shop),
           resolve = c =>
-            c.ctx.nearbyShops(
-              c.arg[Int]("limit"),
-              c.value.position.latitude,
-              c.value.position.longitude,
-              Some(c.value.id)
-            ),
+            c.ctx
+              .nearbyShops(
+                c.arg[Int]("limit"),
+                c.value.position.latitude,
+                c.value.position.longitude,
+                Some(c.value.id)
+              )
+              .to[Future],
           arguments = List(Argument("limit", IntType, defaultValue = schemaConf.getInt("defaultNearbyShops")))
         ),
         Field(
@@ -101,7 +112,8 @@ object SchemaDefinition {
                 c.value.position.latitude,
                 c.value.position.longitude,
                 Some(c.value.id)
-              ),
+              )
+              .to[Future],
           arguments = List(Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")))
         )
       )
@@ -113,13 +125,13 @@ object SchemaDefinition {
       Field(
         "shop",
         OptionType(shop),
-        resolve = c => c.ctx.findShop(c.arg[Int]("id")),
+        resolve = c => c.ctx.findShop(c.arg[Int]("id")).to[Future],
         arguments = List(Argument("id", IntType))
       ),
       Field(
         "shops",
         ListType(shop),
-        resolve = c => c.ctx.all(c.arg[Int]("limit"), c.arg[Int]("offset")),
+        resolve = c => c.ctx.all(c.arg[Int]("limit"), c.arg[Int]("offset")).to[Future],
         arguments = List(
           Argument("limit", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultLimit")),
           Argument("offset", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultOffset"))
@@ -128,7 +140,7 @@ object SchemaDefinition {
       Field(
         "nearbyShops",
         ListType(shop),
-        resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        resolve = c => c.ctx.nearbyShops(c.arg[Int]("limit"), c.arg[Double]("lat"), c.arg[Double]("long")).to[Future],
         arguments = List(
           Argument("limit", IntType, defaultValue = schemaConf.getInt("shopQuery.defaultLimit")),
           Argument("lat", FloatType),
@@ -138,7 +150,8 @@ object SchemaDefinition {
       Field(
         "shopsInRadius",
         ListType(shop),
-        resolve = c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.arg[Double]("lat"), c.arg[Double]("long")),
+        resolve =
+          c => c.ctx.shopsInRadius(c.arg[Int]("radius"), c.arg[Double]("lat"), c.arg[Double]("long")).to[Future],
         arguments = List(
           Argument("radius", IntType, defaultValue = schemaConf.getInt("shopsInRadius.defaultRadio")),
           Argument("lat", FloatType),
@@ -185,20 +198,22 @@ object SchemaDefinition {
         arguments = List(createShopInput),
         resolve = c => {
           val values = c.arg[Map[String, Any]]("input")
-          val id = c.ctx.createShop(
-            values("id").asInstanceOf[Int],
-            values.getOrElse("businessName", None).asInstanceOf[Option[String]],
-            values("name").asInstanceOf[String],
-            values.getOrElse("activity", None).asInstanceOf[Option[Int]],
-            values.getOrElse("stratum", None).asInstanceOf[Option[Int]],
-            values("address").asInstanceOf[String],
-            values.getOrElse("phoneNumber", None).asInstanceOf[Option[String]],
-            values.getOrElse("email", None).asInstanceOf[Option[String]],
-            values.getOrElse("website", None).asInstanceOf[Option[String]],
-            values.getOrElse("shopType", None).asInstanceOf[Option[Int]],
-            Position(values("lat").asInstanceOf[Double], values("long").asInstanceOf[Double])
-          )
-          ShopPayload(id)
+          c.ctx
+            .createShop(
+              values("id").asInstanceOf[Int],
+              values.getOrElse("businessName", None).asInstanceOf[Option[String]],
+              values("name").asInstanceOf[String],
+              values.getOrElse("activity", None).asInstanceOf[Option[Int]],
+              values.getOrElse("stratum", None).asInstanceOf[Option[Int]],
+              values("address").asInstanceOf[String],
+              values.getOrElse("phoneNumber", None).asInstanceOf[Option[String]],
+              values.getOrElse("email", None).asInstanceOf[Option[String]],
+              values.getOrElse("website", None).asInstanceOf[Option[String]],
+              values.getOrElse("shopType", None).asInstanceOf[Option[Int]],
+              Position(values("lat").asInstanceOf[Double], values("long").asInstanceOf[Double])
+            )
+            .map(it => ShopPayload(it))
+            .to[Future]
         }
       )
     )

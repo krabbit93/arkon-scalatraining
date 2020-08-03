@@ -34,4 +34,5 @@ object Server extends App {
       log.error(ex, "Failed to bind to {}:{}!", host, port)
       system.terminate()
   }
+
 }

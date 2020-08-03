@@ -1,5 +1,6 @@
 package training.modules.shops
 
+import doobie.ConnectionIO
 import doobie.implicits._
 
 class ShopRepository() {
@@ -16,15 +17,13 @@ class ShopRepository() {
       website: Option[String],
       shopTypeId: Option[Int],
       position: Position
-  ): Unit = {
+  ): ConnectionIO[Int] = {
     sql"""insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
           values ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
           ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update.run
-      .transact(DataAccess.xa)
-      .unsafeRunSync()
   }
 
-  def getAll(limit: Int, offset: Int): List[Shop] =
+  def getAll(limit: Int, offset: Int): ConnectionIO[List[Shop]] =
     sql"""
     select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
     st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
@@ -32,21 +31,17 @@ class ShopRepository() {
     """
       .query[Shop]
       .to[List]
-      .transact(DataAccess.xa)
-      .unsafeRunSync()
 
-  def find(id: Int): Option[Shop] = {
+  def find(id: Int): ConnectionIO[Option[Shop]] = {
     sql"""
     select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
     st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop where id = $id;
     """
       .query[Shop]
       .option
-      .transact(DataAccess.xa)
-      .unsafeRunSync()
   }
 
-  def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int]): List[Shop] = {
+  def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int]): ConnectionIO[List[Shop]] = {
     sql"""
     select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
     st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long
@@ -56,11 +51,9 @@ class ShopRepository() {
     """
       .query[Shop]
       .to[List]
-      .transact(DataAccess.xa)
-      .unsafeRunSync()
   }
 
-  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int]): List[Shop] = {
+  def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int]): ConnectionIO[List[Shop]] = {
     sql"""
         select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
         st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
@@ -70,7 +63,5 @@ class ShopRepository() {
      """
       .query[Shop]
       .to[List]
-      .transact(DataAccess.xa)
-      .unsafeRunSync()
   }
 }
