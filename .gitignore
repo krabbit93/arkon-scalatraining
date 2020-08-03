@@ -33,3 +33,4 @@ build
 *.class
 
 .scalafmt.conf
+.sbtopts
