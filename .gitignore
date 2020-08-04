@@ -34,3 +34,5 @@ build
 
 .scalafmt.conf
 .sbtopts
+
+*.sc
