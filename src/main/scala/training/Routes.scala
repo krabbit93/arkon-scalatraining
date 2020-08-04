@@ -18,15 +18,16 @@ object Routes {
 
     post {
       path("api") {
-        entity(as[String]) { jsonString => {
-          decode[GraphqlRequest](jsonString) match {
-            case Left(failure) => {
-              log.error("Error in reading: {}", failure)
-              complete(BadRequest -> HttpEntity(ContentTypes.`application/json`, "Error in request body"))
+        entity(as[String]) { jsonString =>
+          {
+            decode[GraphqlRequest](jsonString) match {
+              case Left(failure) =>
+                log.error("Error in reading: {}", failure)
+                complete(BadRequest -> HttpEntity(ContentTypes.`application/json`, "Error in request body"))
+
+              case Right(json) => Processor(json)
             }
-            case Right(json) => Processor(json)
           }
-        }
         }
       }
     } ~ get {
