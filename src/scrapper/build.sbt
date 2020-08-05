@@ -14,3 +14,4 @@ libraryDependencies ++= Seq(
 scalaSource in Compile := baseDirectory.value / "main/scala"
 scalaSource in Test := baseDirectory.value / "test/scala"
 resourceDirectory in Compile := baseDirectory.value / "main/resources"
+resourceDirectory in Test := baseDirectory.value / "test/resources"
