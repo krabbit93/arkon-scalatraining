@@ -36,3 +36,4 @@ build
 .sbtopts
 
 *.sc
+src/*/target
