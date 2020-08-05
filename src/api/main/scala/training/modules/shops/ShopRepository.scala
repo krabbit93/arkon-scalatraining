@@ -2,6 +2,7 @@ package training.modules.shops
 
 import doobie.ConnectionIO
 import doobie.implicits._
+import training.domain.{Position, Shop}
 
 class ShopRepository() {
 

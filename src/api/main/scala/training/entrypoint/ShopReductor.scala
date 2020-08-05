@@ -1,7 +1,7 @@
 package training.entrypoint
 
 import cats.effect.IO
-import training.modules.shops._
+import training.domain.{CommercialActivity, Position, Shop, ShopType, Stratum}
 
 trait ShopReductor {
   def getShopType(shopTypeId: Int): IO[Option[ShopType]]

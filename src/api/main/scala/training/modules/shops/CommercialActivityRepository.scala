@@ -2,6 +2,7 @@ package training.modules.shops
 
 import doobie.ConnectionIO
 import doobie.implicits.toSqlInterpolator
+import training.domain.CommercialActivity
 
 class CommercialActivityRepository {
 

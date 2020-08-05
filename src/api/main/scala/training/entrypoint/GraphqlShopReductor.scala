@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.event.Logging
 import cats.effect.IO
 import doobie.implicits._
+import training.domain.{CommercialActivity, Position, Shop, ShopType, Stratum}
 import training.modules.shops._
 
 final class GraphqlShopReductor(

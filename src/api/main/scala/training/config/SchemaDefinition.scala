@@ -4,6 +4,7 @@ import cats.effect.{IO, LiftIO}
 import com.typesafe.config.ConfigFactory
 import sangria.marshalling.circe._
 import sangria.schema.{fields, Argument, Field, FloatType, InputField, InputObjectType, IntType, ListType, ObjectType, OptionInputType, OptionType, Schema, StringType}
+import training.domain.{CommercialActivity, Position, Shop, ShopType, Stratum}
 import training.entrypoint.ShopReductor
 import training.modules.shops._
 

@@ -18,7 +18,7 @@
         </encoder>
     </appender>
 
-    <logger name="training.scrapper" level="INFO" additivity="false">
+    <logger name="training" level="INFO" additivity="false">
         <appender-ref ref="FILE"/>
         <appender-ref ref="STDOUT" />
     </logger>
