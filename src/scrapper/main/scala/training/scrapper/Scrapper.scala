@@ -1,15 +1,11 @@
 package training.scrapper
 
-import akka.http.scaladsl.Http
 import cats.effect.IO
 import com.typesafe.scalalogging.Logger
 import training.scrapper.config.dependencies._
 import training.scrapper.modules.apiclient.ApiClient
 import training.scrapper.modules.shared.{Query, ScrapperError}
 import training.scrapper.modules.webcollector.WebCollector
-
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
 
 object Scrapper extends App {
   private val logger = Logger(Scrapper.getClass)

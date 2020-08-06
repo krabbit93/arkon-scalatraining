@@ -1,12 +1,13 @@
 package training.scrapper.modules.webcollector
+import akka.http.javadsl.model.headers.Accept
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.client.RequestBuilding.Get
-import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model.{HttpResponse, MediaTypes, StatusCode}
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.stream.Materializer
 import cats.effect.IO
 import io.circe.parser._
-import io.circe.{Decoder, Encoder, HCursor}
+import io.circe.{Decoder, HCursor}
 import training.domain.ShopRaw
 import training.scrapper.config.dependencies._
 import training.scrapper.modules.shared.{Query, ScrapperError}
@@ -82,8 +83,13 @@ final class INEGIWebCollector extends WebCollector {
     IO.fromFuture(
       IO(
         Http()
-          .singleRequest(Get(query.build()))
-          .flatMap(Unmarshal(_).to[Either[ScrapperError, Seq[ShopRaw]]])
+          .singleRequest(Get(query.build()).withHeaders(Accept.create(MediaTypes.`application/json`)))
+          .flatMap(res =>
+            if (res.status.isSuccess())
+              Unmarshal(res).to[Either[ScrapperError, Seq[ShopRaw]]]
+            else
+              Unmarshal(res.entity).to[String].flatMap(str => Future(Left(ScrapperError(str))))
+          )
       )
     )
   }
