@@ -21,12 +21,12 @@ object Scrapper extends App {
         cb match {
           case Left(exception: Throwable) =>
             logger.error("Unexpected error ocurred: ", exception)
-          case Right(result: Either[ScrapperError, Unit]) =>
+          case Right(result: Either[ScrapperError, String]) =>
             result match {
-              case Right(_) =>
-                logger.info("Request successfully")
+              case Right(str) =>
+                logger.info(f"Request successfully: $str")
               case Left(error: ScrapperError) =>
-                logger.error(s"A error occurred: ${error.message}, cause: ", error.e.orNull)
+                logger.error(f"A error occurred: ${error.message}, cause: ", error.e.orNull)
             }
         }
         IO { system.terminate() }

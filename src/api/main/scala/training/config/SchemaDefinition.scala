@@ -177,13 +177,13 @@ object SchemaDefinition {
         InputField("id", IntType),
         InputField("name", StringType),
         InputField("businessName", OptionInputType(StringType)),
-        InputField("activity", OptionInputType(IntType)),
-        InputField("stratum", OptionInputType(IntType)),
+        InputField("activity", OptionInputType(StringType)),
+        InputField("stratum", OptionInputType(StringType)),
         InputField("address", StringType),
         InputField("phoneNumber", OptionInputType(StringType)),
         InputField("email", OptionInputType(StringType)),
         InputField("website", OptionInputType(StringType)),
-        InputField("shopType", OptionInputType(IntType)),
+        InputField("shopType", OptionInputType(StringType)),
         InputField("lat", FloatType),
         InputField("long", FloatType)
       )
