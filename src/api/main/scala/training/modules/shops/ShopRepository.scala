@@ -19,9 +19,14 @@ class ShopRepository() {
       shopTypeId: Option[Int],
       position: Position
   ): ConnectionIO[Int] = {
-    sql"""insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
-          values ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
-          ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update
+    sql"""
+          |insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
+          |values ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
+          |ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))
+          |ON CONFLICT (id) DO UPDATE SET
+          |name = Excluded.name, business_name = Excluded.business_name, activity_id = Excluded.activity_id, stratum_id = Excluded.stratum_id,
+          |address = Excluded.address, phone_number = Excluded.phone_number, email = Excluded.email, website = Excluded.website,
+          |shop_type_id = Excluded.shop_type_id, position = Excluded.position""".stripMargin.update
       .withUniqueGeneratedKeys[Int]("id")
   }
 
