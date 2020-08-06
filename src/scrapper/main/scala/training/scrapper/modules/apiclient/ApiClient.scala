@@ -1,7 +1,9 @@
 package training.scrapper.modules.apiclient
 
-import training.domain.Shop
+import cats.effect.IO
+import training.domain.ShopRaw
+import training.scrapper.modules.shared.ScrapperError
 
 trait ApiClient {
-  def call(shops: Seq[Shop]): Either[Error, Unit]
+  def apply(shops: Seq[ShopRaw]): IO[Either[ScrapperError, Unit]]
 }

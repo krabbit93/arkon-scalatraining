@@ -1,8 +1,9 @@
 package training.scrapper.modules.webcollector
 
-import training.domain.Shop
-import training.scrapper.modules.shared.Error
+import cats.effect.IO
+import training.domain.ShopRaw
+import training.scrapper.modules.shared.{Query, ScrapperError}
 
 trait WebCollector {
-  def invoke(url: String): Either[Error, Seq[Shop]]
+  def apply(query: Query): IO[Either[ScrapperError, Seq[ShopRaw]]]
 }
