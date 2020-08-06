@@ -1,19 +1,21 @@
 package training.entrypoint
 
-import akka.actor.ActorSystem
 import akka.event.Logging
-import cats.effect.IO
-import doobie.implicits._
-import training.domain.{CommercialActivity, Position, Shop, ShopType, Stratum}
 import training.modules.shops._
+import training.config.dependencies._
+import training.domain._
+import doobie._
+import doobie.implicits._
+import cats._
+import cats.effect._
+import cats.implicits._
 
-final class GraphqlShopReductor(
-    private val shopRepository: ShopRepository,
-    private val shopTypeRepository: ShopTypeRepository,
-    private val stratumRepository: StratumRepository,
-    private val commercialActivityRepository: CommercialActivityRepository
-)(implicit system: ActorSystem)
-    extends ShopReductor {
+final class GraphqlShopReductor()(implicit
+    shopRepository: ShopRepository,
+    shopTypeRepository: ShopTypeRepository,
+    stratumRepository: StratumRepository,
+    commercialActivityRepository: CommercialActivityRepository
+) extends ShopReductor {
   private val log = Logging(system.eventStream, "reductor")
 
   override def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int] = None): IO[List[Shop]] =
@@ -31,31 +33,36 @@ final class GraphqlShopReductor(
       id: Int,
       businessName: Option[String],
       name: String,
-      activityId: Option[Int],
-      stratumId: Option[Int],
+      activity: Option[String],
+      stratum: Option[String],
       address: String,
       phoneNumber: Option[String],
       email: Option[String],
       website: Option[String],
-      shopTypeId: Option[Int],
+      shopType: Option[String],
       position: Position
   ): IO[Int] = {
-    shopRepository
-      .createShop(
-        id = id,
-        businessName = businessName,
-        name = name,
-        activityId = activityId,
-        stratumId = stratumId,
-        address = address,
-        phoneNumber = phoneNumber,
-        email = email,
-        website = website,
-        shopTypeId = shopTypeId,
-        position = position
-      )
+    (for {
+      activityId <- commercialActivityRepository.getIdOrCreate(activity)
+      stratumId  <- stratumRepository.getIdOrCreate(stratum)
+      shopTypeId <- shopTypeRepository.getIdOrCreate(shopType)
+      operation <-
+        shopRepository
+          .createShop(
+            id = id,
+            businessName = businessName,
+            name = name,
+            activityId = activityId,
+            stratumId = stratumId,
+            address = address,
+            phoneNumber = phoneNumber,
+            email = email,
+            website = website,
+            shopTypeId = shopTypeId,
+            position = position
+          )
+    } yield operation)
       .transact(DataAccess.xa)
-      .map(_ => id)
   }
 
   override def getShopType(shopTypeId: Int): IO[Option[ShopType]] =

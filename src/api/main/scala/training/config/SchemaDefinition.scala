@@ -204,13 +204,13 @@ object SchemaDefinition {
               values("id").asInstanceOf[Int],
               values.getOrElse("businessName", None).asInstanceOf[Option[String]],
               values("name").asInstanceOf[String],
-              values.getOrElse("activity", None).asInstanceOf[Option[Int]],
-              values.getOrElse("stratum", None).asInstanceOf[Option[Int]],
+              values.getOrElse("activity", None).asInstanceOf[Option[String]],
+              values.getOrElse("stratum", None).asInstanceOf[Option[String]],
               values("address").asInstanceOf[String],
               values.getOrElse("phoneNumber", None).asInstanceOf[Option[String]],
               values.getOrElse("email", None).asInstanceOf[Option[String]],
               values.getOrElse("website", None).asInstanceOf[Option[String]],
-              values.getOrElse("shopType", None).asInstanceOf[Option[Int]],
+              values.getOrElse("shopType", None).asInstanceOf[Option[String]],
               Position(values("lat").asInstanceOf[Double], values("long").asInstanceOf[Double])
             )
             .map(it => ShopPayload(it))

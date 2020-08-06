@@ -22,13 +22,13 @@ trait ShopReductor {
       id: Int,
       businessName: Option[String],
       name: String,
-      activityId: Option[Int],
-      stratumId: Option[Int],
+      activity: Option[String],
+      stratum: Option[String],
       address: String,
       phoneNumber: Option[String],
       email: Option[String],
       website: Option[String],
-      shopTypeId: Option[Int],
+      shopType: Option[String],
       position: Position
   ): IO[Int]
 }

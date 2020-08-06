@@ -21,7 +21,8 @@ class ShopRepository() {
   ): ConnectionIO[Int] = {
     sql"""insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
           values ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
-          ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update.run
+          ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))""".update
+      .withUniqueGeneratedKeys[Int]("id")
   }
 
   def getAll(limit: Int, offset: Int): ConnectionIO[List[Shop]] =

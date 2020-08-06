@@ -23,7 +23,11 @@ object Processor {
 
   def apply(
       json: GraphqlRequest
-  )(implicit executionContext: ExecutionContextExecutor, system: ActorSystem): StandardRoute = {
+  )(implicit
+      executionContext: ExecutionContextExecutor,
+      system: ActorSystem,
+      shopReductor: ShopReductor
+  ): StandardRoute = {
     val log = Logging(system.eventStream, "processor")
 
     QueryParser.parse(json.query) match {
@@ -34,12 +38,7 @@ object Processor {
             .execute(
               SchemaDefinition.schema,
               document,
-              new GraphqlShopReductor(
-                new ShopRepository,
-                new ShopTypeRepository,
-                new StratumRepository,
-                new CommercialActivityRepository
-              ),
+              shopReductor,
               variables = json.variables,
               operationName = json.operationName,
               exceptionHandler = exceptionHandler

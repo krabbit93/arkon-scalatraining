@@ -8,6 +8,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import io.circe.parser.decode
 import training.config.Marshallers._
+import training.config.dependencies.shopReductor
 import training.entrypoint.Processor
 
 import scala.concurrent.ExecutionContextExecutor
