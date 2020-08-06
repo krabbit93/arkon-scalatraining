@@ -20,8 +20,8 @@ class ShopRepository() {
       position: Position
   ): ConnectionIO[Int] = {
     sql"""
-          |insert into shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
-          |values ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
+          |INSERT INTO shop (id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, position)
+          |VALUES ($id, $name, $businessName, $activityId, $stratumId, $address, $phoneNumber, $email, $website, $shopTypeId,
           |ST_GeographyFromText('POINT(' || ${position.latitude} || ' ' || ${position.longitude} || ')'))
           |ON CONFLICT (id) DO UPDATE SET
           |name = Excluded.name, business_name = Excluded.business_name, activity_id = Excluded.activity_id, stratum_id = Excluded.stratum_id,
@@ -31,43 +31,43 @@ class ShopRepository() {
   }
 
   def getAll(limit: Int, offset: Int): ConnectionIO[List[Shop]] =
-    sql"""
-    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
-    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
-    limit $limit offset $offset
-    """
+    sql"""|
+          |SELECT id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
+          |st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long FROM shop
+          |LIMIT $limit OFFSET $offset
+          |""".stripMargin
       .query[Shop]
       .to[List]
 
   def find(id: Int): ConnectionIO[Option[Shop]] = {
-    sql"""
-    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
-    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop where id = $id;
-    """
+    sql"""|
+          |SELECT id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id, 
+          |st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long FROM shop WHERE id = $id;
+          |""".stripMargin
       .query[Shop]
       .option
   }
 
   def nearbyShops(limit: Int, lat: Double, long: Double, id: Option[Int]): ConnectionIO[List[Shop]] = {
     sql"""
-    select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
-    st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long
-    from shop where (case when $id is null then true else id != $id end)
-    order by position <-> ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')')
-    limit $limit
-    """
+          |SELECT id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
+          |st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long
+          |FROM shop WHERE (CASE WHEN $id IS NULL THEN true ELSE id != $id END)
+          |ORDER BY position <-> ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')')
+          |LIMIT $limit
+          |""".stripMargin
       .query[Shop]
       .to[List]
   }
 
   def shopsInRadius(radius: Int, lat: Double, long: Double, id: Option[Int]): ConnectionIO[List[Shop]] = {
     sql"""
-        select id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
-        st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long from shop
-        where st_dwithin(ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')'), position, $radius)
-        and (case when $id is null then true else id != $id end)
-        order by st_distance(ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')'), position)
-     """
+          |SELECT id, name, business_name, activity_id, stratum_id, address, phone_number, email, website, shop_type_id,
+          |st_x(st_pointfromwkb(position)) lat, st_y(st_pointfromwkb(position)) long FROM shop
+          |WHERE st_dwithin(ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')'), position, $radius)
+          |AND (CASE WHEN $id IS NULL THEN true ELSE id != $id END)
+          |order by st_distance(ST_GeographyFromText('POINT(' || $lat || ' ' || $long || ')'), position)
+          |""".stripMargin
       .query[Shop]
       .to[List]
   }

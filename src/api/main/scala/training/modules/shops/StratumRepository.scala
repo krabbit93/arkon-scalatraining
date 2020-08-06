@@ -8,14 +8,14 @@ import training.domain.Stratum
 class StratumRepository {
   def find(stratumId: Int): ConnectionIO[Option[Stratum]] =
     sql"""
-        select id, name from stratum where id = ${stratumId}
-       """
+        |SELECT id, name FROM stratum WHERE id = $stratumId
+        |""".stripMargin
       .query[Stratum]
       .option
 
   def findByName(stratumName: String): ConnectionIO[Option[Stratum]] =
     sql"""
-         |select id, name from stratum where name = $stratumName
+         |SELECT id, name FROM stratum WHERE name = $stratumName
          |""".stripMargin
       .query[Stratum]
       .option
@@ -33,12 +33,12 @@ class StratumRepository {
     stratumName match {
       case None => (None: Option[Int]).pure[ConnectionIO]
       case Some(value) =>
-        (for {
+        for {
           stratum <- findByName(value)
-          stratumId <- (stratum match {
-              case None        => create(value)
-              case Some(value) => value.id.pure[ConnectionIO]
-            })
-        } yield Some(stratumId))
+          stratumId <- stratum match {
+            case None        => create(value)
+            case Some(value) => value.id.pure[ConnectionIO]
+          }
+        } yield Some(stratumId)
     }
 }

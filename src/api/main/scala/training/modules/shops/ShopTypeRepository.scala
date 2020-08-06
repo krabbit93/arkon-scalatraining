@@ -8,13 +8,13 @@ import training.domain.ShopType
 class ShopTypeRepository {
   def find(shopTypeId: Int): ConnectionIO[Option[ShopType]] = {
     sql"""
-          select id, name from shop_type where id = ${shopTypeId};
-    """.query[ShopType].option
+          |SELECT id, name FROM shop_type WHERE id = $shopTypeId;
+          |""".stripMargin.query[ShopType].option
   }
 
   def findByName(shopTypeName: String): ConnectionIO[Option[ShopType]] =
     sql"""
-         |select id, name from shop_type where name = $shopTypeName
+         |SELECT id, name FROM shop_type WHERE name = $shopTypeName
          |""".stripMargin
       .query[ShopType]
       .option
@@ -32,12 +32,12 @@ class ShopTypeRepository {
     shopTypeName match {
       case None => (None: Option[Int]).pure[ConnectionIO]
       case Some(value) =>
-        (for {
+        for {
           shopType <- findByName(value)
-          shopTypeId <- (shopType match {
-              case None        => create(value)
-              case Some(value) => value.id.pure[ConnectionIO]
-            })
-        } yield Some(shopTypeId))
+          shopTypeId <- shopType match {
+            case None        => create(value)
+            case Some(value) => value.id.pure[ConnectionIO]
+          }
+        } yield Some(shopTypeId)
     }
 }

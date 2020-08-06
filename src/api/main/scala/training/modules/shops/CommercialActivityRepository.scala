@@ -9,14 +9,14 @@ class CommercialActivityRepository {
 
   def find(activityId: Int): ConnectionIO[Option[CommercialActivity]] =
     sql"""
-         |select id, name from comercial_activity where id = $activityId
+         |SELECT id, name FROM comercial_activity WHERE id = $activityId
          |""".stripMargin
       .query[CommercialActivity]
       .option
 
   def findByName(activityName: String): ConnectionIO[Option[CommercialActivity]] =
     sql"""
-         |select id, name from comercial_activity where name = $activityName
+         |SELECT id, name FROM comercial_activity WHERE name = $activityName
          |""".stripMargin
       .query[CommercialActivity]
       .option
@@ -34,12 +34,12 @@ class CommercialActivityRepository {
     activityName match {
       case None => (None: Option[Int]).pure[ConnectionIO]
       case Some(value) =>
-        (for {
+        for {
           activity <- findByName(value)
-          activityId <- (activity match {
-              case None        => create(value)
-              case Some(value) => value.id.pure[ConnectionIO]
-            })
-        } yield Some(activityId))
+          activityId <- activity match {
+            case None        => create(value)
+            case Some(value) => value.id.pure[ConnectionIO]
+          }
+        } yield Some(activityId)
     }
 }
