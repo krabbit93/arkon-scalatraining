@@ -1,6 +1,8 @@
 package training.scrapper
 
+import akka.http.scaladsl.Http
 import cats.effect.IO
+import cats.implicits.catsSyntaxApplicativeId
 import com.typesafe.scalalogging.Logger
 import training.scrapper.config.dependencies._
 import training.scrapper.modules.shared.{Query, ScrapperError}
@@ -12,7 +14,7 @@ object Scrapper extends App {
   collector(Query.fromConfig())
     .flatMap({
       case Right(value) => client(value)
-      case Left(error)  => IO(Left(error))
+      case Left(error)  => Left(error).pure[IO]
     })
     .runAsync(cb => {
       cb match {
@@ -21,12 +23,16 @@ object Scrapper extends App {
         case Right(result: Either[ScrapperError, String]) =>
           result match {
             case Right(str) =>
-              logger.info(f"Request successfully: $str")
+              logger.info(f"Request successfully:\n$str")
             case Left(error: ScrapperError) =>
               logger.error(f"A error occurred: ${error.message}, cause: ", error.e.orNull)
           }
       }
-      IO { system.terminate() }
+      IO.fromFuture(Http().shutdownAllConnectionPools().pure[IO])
+        .flatMap(_ => {
+          system.terminate()
+          ().pure[IO]
+        })
     })
     .unsafeRunSync()
 }
