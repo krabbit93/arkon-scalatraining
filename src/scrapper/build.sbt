@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "ch.qos.logback"              % "logback-classic" % "1.2.3",
   "com.typesafe.scala-logging" %% "scala-logging"   % "3.9.2",
   "com.typesafe"                % "config"          % "1.4.0",
-  "com.typesafe.akka"          %% "akka-http"       % "10.1.10",
+  "com.typesafe.akka"          %% "akka-http"       % "10.1.11",
   "com.typesafe.akka"          %% "akka-stream"     % "2.5.26",
   "org.typelevel"              %% "cats-core"       % "2.0.0",
   "org.typelevel"              %% "cats-effect"     % "2.0.0",
