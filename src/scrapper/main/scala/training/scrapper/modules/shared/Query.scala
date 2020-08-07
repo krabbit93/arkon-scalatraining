@@ -1,6 +1,6 @@
 package training.scrapper.modules.shared
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 
 case class Query(term: String, lat: Double, long: Double, quantity: Int) {
 
@@ -18,12 +18,11 @@ case class Query(term: String, lat: Double, long: Double, quantity: Int) {
 object Query {
   private val clientConfig = ConfigFactory.load("client")
 
-  def fromConfig(): Query = {
+  def fromConfig(): Query =
     Query(
       clientConfig.getString("term"),
       clientConfig.getDouble("lat"),
       clientConfig.getDouble("long"),
       clientConfig.getInt("quantity")
     )
-  }
 }

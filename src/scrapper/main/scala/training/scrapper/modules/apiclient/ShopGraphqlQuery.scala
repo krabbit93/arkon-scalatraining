@@ -1,26 +1,11 @@
 package training.scrapper.modules.apiclient
 
 import io.circe.syntax._
-import io.circe.{Encoder, Json}
 import training.domain.ShopRaw
+import training.scrapper.config.marshallers._
 
 object ShopGraphqlQuery {
   private val alias = "shop"
-  implicit val shopDecoder: Encoder[ShopRaw] = shop =>
-    Json.obj(
-      ("id", shop.id.asJson),
-      ("name", shop.name.asJson),
-      ("businessName", shop.businessName.asJson),
-      ("activity", shop.activity.asJson),
-      ("stratum", shop.stratum.asJson),
-      ("address", shop.address.asJson),
-      ("phoneNumber", shop.phoneNumber.asJson),
-      ("email", shop.email.asJson),
-      ("website", shop.website.asJson),
-      ("shopType", shop.shopType.asJson),
-      ("lat", shop.lat.asJson),
-      ("long", shop.long.asJson)
-    )
 
   def apply(shops: Seq[ShopRaw]): GraphqlQuery = {
     val operationName = "ShopGraphqlQuery"
@@ -35,19 +20,22 @@ object ShopGraphqlQuery {
   }
 
   private def createMap(shops: Seq[ShopRaw]): Map[String, ShopRaw] =
-    shops.map(shop => f"input$alias${shops.indexOf(shop)}" -> shop).toMap
+    shops.map(shop => name(shop, shops) -> shop).toMap
 
   private def createInputs(shops: Seq[ShopRaw]): String =
     shops
-      .map(shop => f"${"$"}input$alias${shops.indexOf(shop)}: CreateShopInput!")
+      .map(shop => f"${$name(shop, shops)}: CreateShopInput!")
       .mkString(", ")
 
   private def simpleMutations(shops: Seq[ShopRaw]): String =
     shops
       .map(shop => f"""
-                      |$alias${shops.indexOf(shop)}: createShop(input: ${"$"}input$alias${shops.indexOf(shop)}) {
+                      |${name(shop, shops)}: createShop(input: ${$name(shop, shops)}) {
                       |  id
                       |}
                       |""".stripMargin)
       .mkString
+
+  private def name(shop: ShopRaw, shops: Seq[ShopRaw]): String  = f"input$alias${shops.indexOf(shop)}"
+  private def $name(shop: ShopRaw, shops: Seq[ShopRaw]): String = f"${"$"}${name(shop, shops)}"
 }
