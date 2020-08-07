@@ -31,3 +31,9 @@ build
 
 #general
 *.class
+
+.scalafmt.conf
+.sbtopts
+
+*.sc
+src/*/target
